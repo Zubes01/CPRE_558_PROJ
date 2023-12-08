@@ -1,20 +1,27 @@
 /* Kernel includes. */
 #include "FreeRTOS.h" /* Must come first. */
 #include "task.h"     /* RTOS task related API prototypes. */
-#include "queue.h"    /* RTOS queue related API prototypes. */
-//#include "timers.h"   /* Software timer related API prototypes. */ //TODO: probably not required
-//#include "semphr.h"   /* Semaphore related API prototypes. */ //TODO: probably not required
+//#include "queue.h"    /* RTOS queue related API prototypes. */ //TODO: probably not required, but unsure so leaving it commented
+//#include "timers.h"   /* Software timer related API prototypes. */ //TODO: probably not required, but unsure so leaving it commented
+//#include "semphr.h"   /* Semaphore related API prototypes. */ //TODO: probably not required, but unsure so leaving it commented
 
 /* TODO Add any manufacture supplied header files can be included
 here. */
 #include "hardware.h"
 
-/* Priorities at which the tasks are created.  The priorities are given 
- * in order of highest to least highest priority, so that task 1 has 
- * the highest priority, task 2 has the second highest priority, etc. */
-#define mainTASK1_TASK_PRIORITY     ( configMAX_PRIORITIES - 1 )
-#define mainTASK2_TASK_PRIORITY     ( configMAX_PRIORITIES - 2 )
-#define mainTASK3_TASK_PRIORITY     ( configMAX_PRIORITIES - 3 )
+/* Scheduling policy 
+ * 0: EDF         
+ * 1: RMS           */
+#define SCHED_POLICY_EDF 0
+#define SCHED_POLICY_RMS 1
+#define SCHED_POLICY SCHED_POLICY_RMS
+
+/* The number of tasks */
+#define NUM_TASKS 3
+/* To add a new task, increment NUM_TASKS, add its period below,
+ * add its function implementation later in this file, add its
+ * function prototype with the others, and add it to the list
+ * of tasks defined in main() */
 
 /* The period of the first task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
@@ -29,6 +36,17 @@ converted to ticks using the pdMS_TO_TICKS() macro. */
 #define mainTASK3_PERIOD_MS                 pdMS_TO_TICKS( 1000 )
 
 /*-----------------------------------------------------------*/
+typedef   int (*Function_Pointer)( void );
+
+struct periodic_task 
+{
+    char *name;             // task name
+    TickType_t  p_i;        // period of task in ticks
+    UBaseType_t priority;   // priority of task (set by scheduling policy)
+    Function_Pointer func;  // pointer to the function which the task will run
+};
+
+/*-----------------------------------------------------------*/
 
 /*
  * TODO: Implement this function for any hardware specific clock configuration
@@ -37,7 +55,7 @@ converted to ticks using the pdMS_TO_TICKS() macro. */
 static void prvSetupHardware( void );
 
 /*
- * The three task functions.
+ * The three task function prototypes.
  */
 static void prvTask1( void *pvParameters );
 static void prvTask2( void *pvParameters );
@@ -51,42 +69,76 @@ int main(void)
     can be done here if it was not done before main() was called. */
     prvSetupHardware();
 
-    /* Create the task 1 */
-    xTaskCreate(     /* The function that implements the task. */
-                    prvTask1,
-                    /* Text name for the task, just to help debugging. */
-                    "Task1",
-                    /* The size (in words) of the stack that should be created
-                    for the task. */
-                    configMINIMAL_STACK_SIZE,
-                    /* A parameter that can be passed into the task.  Not used
-                    in this simple demo. */
-                    NULL,
-                    /* The priority to assign to the task.  tskIDLE_PRIORITY
-                    (which is 0) is the lowest priority.  configMAX_PRIORITIES - 1
-                    is the highest priority. */
-                    mainTASK1_TASK_PRIORITY,
-                    /* Used to obtain a handle to the created task.  Not used in
-                    this simple demo, so set to NULL. */
-                    NULL );
+    /* Create the list of tasks */
+    struct periodic_task tasks[NUM_TASKS] = {
+        {
+            .name = "Task1",
+            .p_i = mainTASK1_PERIOD_MS,
+            .priority = -1,
+            .func = prvTask1
+        },
+        {
+            .name = "Task2",
+            .p_i = mainTASK2_PERIOD_MS,
+            .priority = -1,
+            .func = prvTask2
+        },
+        {
+            .name = "Task3",
+            .p_i = mainTASK3_PERIOD_MS,
+            .priority = -1,
+            .func = prvTask3
+        }
+    };
 
+    /* Set task priorities based on scheduling policy */
+    if ( SCHED_POLICY == SCHED_POLICY_RMS )
+    { 
+        /* in RMS scheduling, the task with the shortest period always has the 
+         * highest priority. This is static and never changes. */
+        TickType_t tempTaskPeriods[NUM_TASKS]; // temporary array to store task periods for sorting
+        for (int i = 0; i < NUM_TASKS; i++)
+        {
+            tempTaskPeriods[i] = tasks.p_i[i];
+        }
+        for (int tasks_assigned = 0; tasks_assigned < NUM_TASKS; tasks_assigned++)
+        {
+            /* find the task with the shortest period */
+            TickType_t shortest_period = tempTaskPeriods[0];
+            int shortest_period_index = 0;
+            for (int i = 1; i < NUM_TASKS; i++)
+            {
+                if (tempTaskPeriods[i] < shortest_period && tempTaskPeriods[i] != -1)
+                { /* If the task period is shorter and available (not already used) */
+                    shortest_period = tempTaskPeriods[i];
+                    shortest_period_index = i;
+                }
+            }
 
-    /* Create the task 2 */
-    xTaskCreate(    prvTask2,
-                    "Task2",
-                    configMINIMAL_STACK_SIZE,
-                    NULL,
-                    mainTASK2_TASK_PRIORITY,
-                    NULL );
+            /* assign the task with the shortest period the highest priority */
+            tasks.priority[shortest_period_index] = ( configMAX_PRIORITIES - 1 ) - tasks_assigned;
 
+            /* remove the task with the shortest period from the list */
+            tempTaskPeriods[shortest_period_index] = -1;
+        }
+    }
+    else if ( SCHED_POLICY == SCHED_POLICY_EDF )
+    {
+        /* in EDF scheduling, the task with the earliest deadline always has the 
+         * highest priority. This is dynamic and changes as the tasks run. */
+        //TODO: implement EDF scheduling
+    }
+    else
+    {
+        /* invalid scheduling policy */
+        while(1);
+    }
 
-    /* Create the task 3 */
-    xTaskCreate(    prvTask3,
-                    "Task3",
-                    configMINIMAL_STACK_SIZE,
-                    NULL,
-                    mainTASK3_TASK_PRIORITY,
-                    NULL );
+    /* Create the tasks */
+    for (int i = 0; i < NUM_TASKS; i++)
+    {
+        xTaskCreate( tasks.func[i], tasks.name[i], configMINIMAL_STACK_SIZE, NULL, tasks.priority[i], NULL );
+    }
 
     /* Start the tasks and timer running. */
     vTaskStartScheduler();
