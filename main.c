@@ -16,8 +16,14 @@ here. */
 #define SCHED_POLICY_RMS 1
 #define SCHED_POLICY SCHED_POLICY_RMS
 
-/* The number of tasks */
-#define NUM_TASKS 3
+/* Aperiodic server type
+ * 0: no aperiodic server 
+ * 1: polling server
+ * 2: deferrable server */
+#define APERIODIC_SERVER_TYPE 2
+
+/* The number of tasks, including the any server */
+#define NUM_TASKS 4
 /* To add a new task, increment NUM_TASKS, add its period below,
  * add its function implementation later in this file, add its
  * function prototype with the others, and add it to the list
@@ -34,6 +40,10 @@ converted to ticks using the pdMS_TO_TICKS() macro. */
 /* The period of the third task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
 #define mainTASK3_PERIOD_MS                 pdMS_TO_TICKS( 1000 )
+
+/* The period of the deferrable server, specified in milliseconds, and
+converted to ticks using the pdMS_TO_TICKS() macro. */
+#define mainDEFERRABLE_SERVER_PERIOD_MS     pdMS_TO_TICKS( 100 )
 
 /*-----------------------------------------------------------*/
 typedef   int (*Function_Pointer)( void );
@@ -60,6 +70,7 @@ static void prvSetupHardware( void );
 static void prvTask1( void *pvParameters );
 static void prvTask2( void *pvParameters );
 static void prvTask3( void *pvParameters );
+static void prvDeferrableServer( void *pvParameters );
 
 /*-----------------------------------------------------------*/
 
@@ -88,6 +99,12 @@ int main(void)
             .p_i = mainTASK3_PERIOD_MS,
             .priority = -1,
             .func = prvTask3
+        },
+        {
+            .name = "Deferrable Server",
+            .p_i = mainDEFERRABLE_SERVER_PERIOD_MS,
+            .priority = -1,
+            .func = prvDeferrableServer
         }
     };
 
@@ -161,6 +178,8 @@ static void prvTask1( void *pvParameters )
 
     for( ;; )
     {
+        // DO SOMETHING
+
         /* Place this task in the blocked state until it is time to run again.
         The block time is specified in ticks, the constant used converts ticks
         to ms.  The task will not consume any CPU time while it is in the
@@ -179,6 +198,8 @@ static void prvTask2( void *pvParameters )
 
     for( ;; )
     {
+        // DO SOMETHING
+
         /* Place this task in the blocked state until it is time to run again.
         The block time is specified in ticks, the constant used converts ticks
         to ms.  The task will not consume any CPU time while it is in the
@@ -197,11 +218,34 @@ static void prvTask3( void *pvParameters )
 
     for( ;; )
     {
+        // DO SOMETHING
+
         /* Place this task in the blocked state until it is time to run again.
         The block time is specified in ticks, the constant used converts ticks
         to ms.  The task will not consume any CPU time while it is in the
         Blocked state. */
         vTaskDelayUntil( &xNextWakeTime, mainTASK3_PERIOD_MS );
+    }
+}
+/*-----------------------------------------------------------*/
+
+static void prvDeferrableServer( void *pvParameters )
+{
+    TickType_t xNextWakeTime;
+
+    /* Initialise xNextWakeTime - this only needs to be done once. */
+    xNextWakeTime = xTaskGetTickCount();
+
+    for( ;; )
+    {
+        // TODO: check for aperiodic tasks
+        // run aperiodic tasks if they exist
+
+        /* Place this task in the blocked state until it is time to run again.
+        The block time is specified in ticks, the constant used converts ticks
+        to ms.  The task will not consume any CPU time while it is in the
+        Blocked state. */
+        vTaskDelayUntil( &xNextWakeTime, mainDEFERRABLE_SERVER_PERIOD_MS );
     }
 }
 /*-----------------------------------------------------------*/
