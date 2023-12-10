@@ -267,23 +267,23 @@ int main( void )
     // };
 
     struct periodic_task *tasks;
-    tasks = calloc( NUM_TASKS, sizeof(periodic_task) );
+    tasks = pvPortMalloc( NUM_TASKS * sizeof( periodic_task ) );
 
-    tasks[0].name = malloc(12);
+    tasks[0].name = pvPortMalloc( 12 * sizeof( char ) ); 
     tasks[0].name = "Task1\0";
     tasks[0].p_i = mainTASK1_PERIOD_MS;
     tasks[0].start_time = 0;
     tasks[0].priority = -1;
     tasks[0].func = prvTask1;
 
-    tasks[1].name = malloc(12);
+    tasks[1].name = pvPortMalloc( 12 * sizeof( char ) );
     tasks[1].name = "Task2\0";
     tasks[1].p_i = mainTASK2_PERIOD_MS;
     tasks[1].start_time = 0;
     tasks[1].priority = -1;
     tasks[1].func = prvTask2;
 
-    tasks[2].name = malloc(12);
+    tasks[2].name = pvPortMalloc( 12 * sizeof( char ) );
     tasks[2].name = "Task3\0";
     tasks[2].p_i = mainTASK3_PERIOD_MS;
     tasks[2].start_time = 0;
@@ -292,7 +292,7 @@ int main( void )
 
     if APERIODIC_SERVER_TYPE == SERVER_TYPE_POLLING_SERVER
     {
-        tasks[3].name = malloc(12);
+        tasks[3].name = pvPortMalloc( 12 * sizeof( char ) );
         tasks[3].name = "d\0";
         tasks[3].p_i = mainPOLLING_SERVER_PERIOD_MS;
         tasks[3].start_time = 0;
@@ -301,7 +301,7 @@ int main( void )
     }
     else if APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER
     {
-        tasks[3].name = malloc(12);
+        tasks[3].name = pvPortMalloc( 12 * sizeof( char ) );
         tasks[3].name = "d\0";
         tasks[3].p_i = mainDEFERRABLE_SERVER_PERIOD_MS;
         tasks[3].start_time = 0;
