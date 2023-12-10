@@ -24,6 +24,7 @@ main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/portable
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/mpu_wrappers.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/task.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h
+main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/timers.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_sysctl.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h
@@ -102,6 +103,8 @@ C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/mpu_wrappe
 C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/task.h:
 
 C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h:
+
+C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/timers.h:
 
 C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h:
 

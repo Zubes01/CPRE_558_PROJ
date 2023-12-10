@@ -26,6 +26,8 @@ third_party/FreeRTOS/Source/tasks.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_p
 third_party/FreeRTOS/Source/tasks.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h
 third_party/FreeRTOS/Source/tasks.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/timers.h
 third_party/FreeRTOS/Source/tasks.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/StackMacros.h
+third_party/FreeRTOS/Source/tasks.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdio.h
+third_party/FreeRTOS/Source/tasks.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdarg.h
 
 C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/tasks.c:
 
@@ -78,4 +80,8 @@ C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h:
 C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/timers.h:
 
 C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/StackMacros.h:
+
+C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdio.h:
+
+C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdarg.h:
 

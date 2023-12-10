@@ -17,6 +17,7 @@ int moveForward(oi_t *sensor_data, double distance_mm)
     oi_setWheels(350,350);
     while (sum < distance_mm)
     {
+       oi_setWheels(350,350);
        oi_update(sensor_data);
        sum += sensor_data -> distance;
        if (sensor_data->bumpLeft || sensor_data->bumpRight)
