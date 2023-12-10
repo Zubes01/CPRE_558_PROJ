@@ -176,6 +176,7 @@ static void prvEDFScheduler( struct periodic_task *tasks, int calling_task_index
 
 /*----------GLOBALS-----------*/
 int count = 0;
+int aperiodic_tasks_this_cycle = 0;
 static QueueHandle_t aperiodic_task_queue;
 struct aperiodic_task sample_aperiodic_task = {
     .name = "sample\0",
@@ -441,18 +442,15 @@ static void prvTask1( void *pvParameters )
         if ( APERIODIC_SERVER_TYPE != SERVER_TYPE_NO_SERVER && rand() % 10 == 0 )
         {
             xQueueSend( aperiodic_task_queue, ( void * ) &sample_aperiodic_task, 0 );
-            if ( APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER )
+            if ( APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER && aperiodic_tasks_this_cycle == 0 )
             {
                 /* if the aperiodic server type is a deferrable server, 
-                 * and it is in the blocked state, we must wake the 
-                 * server so that it can execute the aperiodic task */
+                 * and it is in the blocked state, and it has not yet
+                 * executed an aperiodic task this cycle, we must wake
+                 * the server so that it can execute the aperiodic task */
                 TaskHandle_t deferrable_server_handle = xTaskGetHandle( "d\0" );
                 xTaskAbortDelay( deferrable_server_handle );
                 /* if it is not in the blocked state this shouldn't do anything */
-                /* NOTE: this method of deferrable server handling WILL cause the
-                 * server to execute as many aperiodic tasks per cycle as it was 
-                 * sent with no regard to how much time it has taken up. This 
-                 * must be fixed later TODO */
             }
         }
 
@@ -648,9 +646,11 @@ static void prvDeferrableServer( void *pvParameters )
 
         /* Check the queue for an aperiodic task */
         struct aperiodic_task received_task;
+        aperiodic_tasks_this_cycle = 0;
         if ( xQueueReceive( aperiodic_task_queue, &received_task, 0 ) == pdPASS )
         {
             /* If an aperiodic task was received, run it */
+            aperiodic_tasks_this_cycle++;
             received_task.func();
         }
         //TODO: implement using the c_i value of the aperiodic task?
