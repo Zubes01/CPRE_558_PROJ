@@ -19,6 +19,12 @@
  *
  */
 
+/* CHANGES DEC 10: 
+ * sample aperiodic task implemented
+ * deferrable and periodic server aperiodic task handling partially implemented
+ * task list now allocated using dynamic memory allocation
+ * other small changes here and there */
+
 /* Standard includes. */
 #include <stdio.h>
 #include <stdbool.h>
@@ -66,7 +72,10 @@
  * 0: no aperiodic server
  * 1: polling server
  * 2: deferrable server */
-#define APERIODIC_SERVER_TYPE 2
+#define SERVER_TYPE_NO_SERVER 0
+#define SERVER_TYPE_POLLING_SERVER 1
+#define SERVER_TYPE_DEFERRABLE_SERVER 2
+#define APERIODIC_SERVER_TYPE SERVER_TYPE_DEFERRABLE_SERVER
 
 /* The number of tasks, including the any server */
 #define NUM_TASKS 4
@@ -81,23 +90,23 @@
 
 /* The period of the first task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK1_PERIOD_MS                 pdMS_TO_TICKS( 240 )//5 seconds to move and scan
+#define mainTASK1_PERIOD_MS                  240 //5 seconds to move and scan
 
 /* The period of the second task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK2_PERIOD_MS                 pdMS_TO_TICKS( 480 )
+#define mainTASK2_PERIOD_MS                  480 
 
 /* The period of the third task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK3_PERIOD_MS                 pdMS_TO_TICKS( 960 )
+#define mainTASK3_PERIOD_MS                  960 
 
 /* The period of the deferrable server, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainDEFERRABLE_SERVER_PERIOD_MS     pdMS_TO_TICKS( 1920 )
+#define mainDEFERRABLE_SERVER_PERIOD_MS     1920 
 
 /* The period of the polling server, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainPOLLING_SERVER_PERIOD_MS     pdMS_TO_TICKS( 100 )//shaved a zero off
+#define mainPOLLING_SERVER_PERIOD_MS        100 //shaved a zero off
 /*-----------------------------------------------------------*/
 
 /* Task indices */
@@ -132,6 +141,13 @@ struct periodic_task
     TickType_t start_time;  // time that the task became unblocked, i.e. entered it's next period
 };
 
+struct aperiodic_task
+{
+    char *name;             // task name
+    uint c_i;               // computation time of task in ms
+    Function_Pointer func;  // pointer to the function which the task will run
+};
+
 /*-----------------------------------------------------------*/
 
 /*
@@ -158,7 +174,15 @@ static void prvEDFScheduler( struct periodic_task *tasks, int calling_task_index
  * as the example is running. */
 //static void prvConfigureUART(void);
 
+/*----------GLOBALS-----------*/
 int count = 0;
+static QueueHandle_t aperiodic_task_queue;
+struct aperiodic_task sample_aperiodic_task = {
+    .name = "sample\0",
+    .c_i = 100, // 1/10 of a second
+    .func = sample_aperiodic_task_func
+};
+
 //struct periodic_task tasks[NUM_TASKS] = {
 //    {
 //        .name = "Task1\0",
@@ -204,38 +228,90 @@ int main( void )
 //    uart_init();
     int i, tasks_assigned;
 
-    /* Create the list of tasks */
-    struct periodic_task tasks[NUM_TASKS] = {
-        {
-            .name = "Task1\0",
-            .p_i = mainTASK1_PERIOD_MS,
-            .start_time = 0,
-            .priority = -1,
-            .func = prvTask1
-        },
-        {
-            .name = "Task2\0",
-            .p_i = mainTASK2_PERIOD_MS,
-            .start_time = 0,
-            .priority = -1,
-            .func = prvTask2
-        },
-        {
-            .name = "Task3\0",
-            .p_i = mainTASK3_PERIOD_MS,
-            .start_time = 0,
-            .priority = -1,
-            .func = prvTask3
-        },
-        { //TODO: add if statement to switch between this and polling server
-            .name = "d\0",
-            .p_i = mainDEFERRABLE_SERVER_PERIOD_MS,
-            .start_time = 0,
-            .priority = -1,
-            .func = prvDeferrableServer
-        }
-    };
+    /* Create the queue for aperiodic tasks if an aperiodic server is desired */
+    if ( APERIODIC_SERVER_TYPE !=  0 )
+    {
+        aperiodic_task_queue = xQueueCreate( 10, sizeof( struct aperiodic_task ) );
+    }
 
+    /* Create the list of tasks */
+    // struct periodic_task tasks[NUM_TASKS] = {
+    //     {
+    //         .name = "Task1\0",
+    //         .p_i = mainTASK1_PERIOD_MS,
+    //         .start_time = 0,
+    //         .priority = -1,
+    //         .func = prvTask1
+    //     },
+    //     {
+    //         .name = "Task2\0",
+    //         .p_i = mainTASK2_PERIOD_MS,
+    //         .start_time = 0,
+    //         .priority = -1,
+    //         .func = prvTask2
+    //     },
+    //     {
+    //         .name = "Task3\0",
+    //         .p_i = mainTASK3_PERIOD_MS,
+    //         .start_time = 0,
+    //         .priority = -1,
+    //         .func = prvTask3
+    //     },
+    //     { //TODO: add if statement to switch between this and polling server
+    //         .name = "d\0",
+    //         .p_i = mainDEFERRABLE_SERVER_PERIOD_MS,
+    //         .start_time = 0,
+    //         .priority = -1,
+    //         .func = prvDeferrableServer
+    //     }
+    // };
+
+    struct periodic_task *tasks;
+    tasks = calloc( NUM_TASKS, sizeof(periodic_task) );
+
+    tasks[0].name = malloc(12);
+    tasks[0].name = "Task1\0";
+    tasks[0].p_i = mainTASK1_PERIOD_MS;
+    tasks[0].start_time = 0;
+    tasks[0].priority = -1;
+    tasks[0].func = prvTask1;
+
+    tasks[1].name = malloc(12);
+    tasks[1].name = "Task2\0";
+    tasks[1].p_i = mainTASK2_PERIOD_MS;
+    tasks[1].start_time = 0;
+    tasks[1].priority = -1;
+    tasks[1].func = prvTask2;
+
+    tasks[2].name = malloc(12);
+    tasks[2].name = "Task3\0";
+    tasks[2].p_i = mainTASK3_PERIOD_MS;
+    tasks[2].start_time = 0;
+    tasks[2].priority = -1;
+    tasks[2].func = prvTask3;
+
+    if APERIODIC_SERVER_TYPE == SERVER_TYPE_POLLING_SERVER
+    {
+        tasks[3].name = malloc(12);
+        tasks[3].name = "d\0";
+        tasks[3].p_i = mainPOLLING_SERVER_PERIOD_MS;
+        tasks[3].start_time = 0;
+        tasks[3].priority = -1;
+        tasks[3].func = prvPollingServer;
+    }
+    else if APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER
+    {
+        tasks[3].name = malloc(12);
+        tasks[3].name = "d\0";
+        tasks[3].p_i = mainDEFERRABLE_SERVER_PERIOD_MS;
+        tasks[3].start_time = 0;
+        tasks[3].priority = -1;
+        tasks[3].func = prvDeferrableServer;
+    }
+    else
+    {
+        while (1); // invalid server type
+    }
 
 //    struct periodic_task *tasks;
 //    tasks = calloc( NUM_TASKS, sizeof(periodic_task) );
@@ -274,7 +350,7 @@ int main( void )
             tempTaskPeriods[shortest_period_index] = -1;
         }
     }
-        else
+    else
     {
         /* invalid scheduling policy */
         while(1);
@@ -293,15 +369,16 @@ int main( void )
         else if(i == mainTASK3_INDEX  ){
             xTaskCreate( prvTask3, tasks[i].name, configMINIMAL_STACK_SIZE, (void *) tasks, tasks[i].priority, &tasks[i].handle );
         }
-        else if(i == mainDEFERRABLE_SERVER_INDEX ){
+        else if(i == mainDEFERRABLE_SERVER_INDEX && APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER){
 //            uart_sendStr_A("Defer deez nuts created\r\n");
             xTaskCreate( prvDeferrableServer, tasks[i].name, configMINIMAL_STACK_SIZE, (void *) tasks, tasks[i].priority, &tasks[i].handle );
         }
-        else if(i == mainPOLLING_SERVER_INDEX ){
+        else if(i == mainPOLLING_SERVER_INDEX && APERIODIC_SERVER_TYPE == SERVER_TYPE_POLLING_SERVER){
             xTaskCreate( prvPollingServer, tasks[i].name, configMINIMAL_STACK_SIZE, (void *) tasks, tasks[i].priority, &tasks[i].handle );
         }
         else
         {
+            while(1); // invalid task index
 //            lcd_putc('t');
         }
     }
@@ -359,6 +436,25 @@ static void prvTask1( void *pvParameters )
 //        {
 //            xTimeNow = xTaskGetTickCount();
 //        }
+
+        /* given a 1/10 chance, put an aperiodic task onto the queue */
+        if ( APERIODIC_SERVER_TYPE != SERVER_TYPE_NO_SERVER && rand() % 10 == 0 )
+        {
+            xQueueSend( aperiodic_task_queue, ( void * ) &sample_aperiodic_task, 0 );
+            if ( APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER )
+            {
+                /* if the aperiodic server type is a deferrable server, 
+                 * and it is in the blocked state, we must wake the 
+                 * server so that it can execute the aperiodic task */
+                TaskHandle_t deferrable_server_handle = xTaskGetHandle( "d\0" );
+                xTaskAbortDelay( deferrable_server_handle );
+                /* if it is not in the blocked state this shouldn't do anything */
+                /* NOTE: this method of deferrable server handling WILL cause the
+                 * server to execute as many aperiodic tasks per cycle as it was 
+                 * sent with no regard to how much time it has taken up. This 
+                 * must be fixed later TODO */
+            }
+        }
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -549,8 +645,15 @@ static void prvDeferrableServer( void *pvParameters )
 //        }
 
 //        //timer_waitMillis(400);
-        // TODO: check for aperiodic tasks
-        // run aperiodic tasks if they exist
+
+        /* Check the queue for an aperiodic task */
+        struct aperiodic_task received_task;
+        if ( xQueueReceive( aperiodic_task_queue, &received_task, 0 ) == pdPASS )
+        {
+            /* If an aperiodic task was received, run it */
+            received_task.func();
+        }
+        //TODO: implement using the c_i value of the aperiodic task?
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -585,9 +688,7 @@ static void prvPollingServer( void *pvParameters )
     int this_task_index = mainPOLLING_SERVER_INDEX;
     TickType_t this_task_period = mainPOLLING_SERVER_PERIOD_MS;
 
-//    char str[50];
-
-/* All tasks will be passed the periodic task list in their parameters */
+    /* All tasks will be passed the periodic task list in their parameters */
     struct periodic_task *tasks = (struct periodic_task *) pvParameters;
 
     /* Initialise xNextWakeTime - this only needs to be done once. */
@@ -603,16 +704,15 @@ static void prvPollingServer( void *pvParameters )
 
     for( ;; )
     {
-//        TickType_t xTimeNow;
-//        TickType_t final;
-//        xTimeNow = xTaskGetTickCount();
-//        final = xTimeNow + pdMS_TO_TICKS( 500 );
-//        while(final > xTimeNow)
-//        {
-//            xTimeNow = xTaskGetTickCount();
-//        }
-        // TODO: check for aperiodic tasks
-        // run aperiodic tasks if they exist
+        /* Check the queue for an aperiodic task */
+        struct aperiodic_task received_task;
+        if ( xQueueReceive( aperiodic_task_queue, &received_task, 0 ) == pdPASS )
+        {
+            /* If an aperiodic task was received, run it */
+            received_task.func();
+        }
+        //TODO: implement using the c_i value of the aperiodic task?
+
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -770,3 +870,17 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 /*-----------------------------------------------------------*/
 
 
+void sample_aperiodic_task_func( void )
+{
+    /* This function is called by the aperiodic server when it receives an
+     * aperiodic task. */
+    uart_sendStr_A("Aperiodic task... RUNNING BABY!\r\n");
+
+    /* Send funny ascii art */
+    uart_sendStr_A("  _   _      _ _         __        __         _     _ \r\n");
+    uart_sendStr_A(" | | | | ___| | | ___    \\ \\      / /__  _ __| | __| |\r\n");
+    uart_sendStr_A(" | |_| |/ _ \\ | |/ _ \\    \\ \\ /\\ / / _ \\| '__| |/ _` |\r\n");
+    uart_sendStr_A(" |  _  |  __/ | | (_) |    \\ V  V / (_) | |  | | (_| |\r\n");
+    uart_sendStr_A(" |_| |_|\\___|_|_|\\___/      \\_/\\_/ \\___/|_|  |_|\\__,_|\r\n");
+    uart_sendStr_A("                                                      \r\n");
+}
