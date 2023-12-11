@@ -14,16 +14,16 @@ hello_task.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/s
 hello_task.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_stdint.h
 hello_task.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h
 hello_task.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/FreeRTOS.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/FreeRTOS.h
 hello_task.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stddef.h
 hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/FreeRTOSConfig.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/projdefs.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/portable.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/deprecated_definitions.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portmacro.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/mpu_wrappers.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/task.h
-hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/projdefs.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portable.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/deprecated_definitions.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portmacro.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/mpu_wrappers.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/task.h
+hello_task.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/list.h
 hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_ints.h
 hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h
 hello_task.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/sysctl.h
@@ -58,25 +58,25 @@ C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h:
 
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/FreeRTOS.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/FreeRTOS.h:
 
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stddef.h:
 
 U:/cpre558ProjWorkspace/558_scheduler/FreeRTOSConfig.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/projdefs.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/projdefs.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/portable.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portable.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/deprecated_definitions.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/deprecated_definitions.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portmacro.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portmacro.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/mpu_wrappers.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/mpu_wrappers.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/task.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/task.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/list.h:
 
 C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_ints.h:
 

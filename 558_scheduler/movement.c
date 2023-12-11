@@ -55,6 +55,7 @@ void turnLeft(oi_t *sensor_data, double degrees)
     oi_setWheels(-30,30);
     while (sum < degrees)
     {
+       oi_setWheels(-30,30);
        oi_update(sensor_data);
        sum += ABS(sensor_data -> angle);
     }
@@ -66,8 +67,9 @@ void backup(oi_t *sensor_data, double distance_mm)
 {
     double sum = 0;
     oi_setWheels(-350,-350);
-    while (sum < 150)
+    while (sum < distance_mm)
     {
+       oi_setWheels(-350,-350);
        oi_update(sensor_data);
        sum += ABS(sensor_data -> distance);
     }
@@ -80,6 +82,7 @@ void turnRight(oi_t *sensor_data, double degrees)
     oi_setWheels(30, -30);
     while (sum < degrees)
     {
+        oi_setWheels(30, -30);
        oi_update(sensor_data);
        sum += ABS(sensor_data -> angle);
     }

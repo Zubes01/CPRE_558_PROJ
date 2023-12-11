@@ -53,6 +53,7 @@
 #include "Timer.h"
 #include "lcd.h"
 #include "uart.h"
+#include "semphr.h"
 
 // Uncomment or add any include directives that are needed
 #include "open_interface.h"
@@ -75,7 +76,7 @@
 #define SERVER_TYPE_NO_SERVER 0
 #define SERVER_TYPE_POLLING_SERVER 1
 #define SERVER_TYPE_DEFERRABLE_SERVER 2
-#define APERIODIC_SERVER_TYPE SERVER_TYPE_DEFERRABLE_SERVER
+#define APERIODIC_SERVER_TYPE SERVER_TYPE_POLLING_SERVER
 
 /* The number of tasks, including the any server */
 #define NUM_TASKS 4
@@ -90,23 +91,23 @@
 
 /* The period of the first task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK1_PERIOD_MS                  240 //5 seconds to move and scan
+#define mainTASK1_PERIOD_MS                  4800 //5 seconds to move and scan
 
 /* The period of the second task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK2_PERIOD_MS                  480 
+#define mainTASK2_PERIOD_MS                  9600
 
 /* The period of the third task, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK3_PERIOD_MS                  960 
+#define mainTASK3_PERIOD_MS                  19200
 
 /* The period of the deferrable server, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainDEFERRABLE_SERVER_PERIOD_MS     1920 
+#define mainDEFERRABLE_SERVER_PERIOD_MS     2400
 
 /* The period of the polling server, specified in milliseconds, and
 converted to ticks using the pdMS_TO_TICKS() macro. */
-#define mainPOLLING_SERVER_PERIOD_MS        100 //shaved a zero off
+#define mainPOLLING_SERVER_PERIOD_MS        2400 //shaved a zero off
 /*-----------------------------------------------------------*/
 
 /* Task indices */
@@ -144,7 +145,7 @@ struct periodic_task
 struct aperiodic_task
 {
     char *name;             // task name
-    uint c_i;               // computation time of task in ms
+    uint32_t c_i;               // computation time of task in ms
     Function_Pointer func;  // pointer to the function which the task will run
 };
 
@@ -155,6 +156,8 @@ struct aperiodic_task
  * that was not already performed before main() was called.
  */
 static void prvSetupHardware( void );
+
+void sample_aperiodic_task_func( void );
 
 /*
  * The three task function prototypes.
@@ -175,45 +178,16 @@ static void prvEDFScheduler( struct periodic_task *tasks, int calling_task_index
 //static void prvConfigureUART(void);
 
 /*----------GLOBALS-----------*/
-int count = 0;
+//int count = 0;
 int aperiodic_tasks_this_cycle = 0;
 static QueueHandle_t aperiodic_task_queue;
 struct aperiodic_task sample_aperiodic_task = {
     .name = "sample\0",
     .c_i = 100, // 1/10 of a second
-    .func = sample_aperiodic_task_func
+    .func = (Function_Pointer) sample_aperiodic_task_func
 };
+oi_t *sensor_data;
 
-//struct periodic_task tasks[NUM_TASKS] = {
-//    {
-//        .name = "Task1\0",
-//        .p_i = mainTASK1_PERIOD_MS,
-//        .start_time = 0,
-//        .priority = -1,
-//        .func = prvTask1
-//    },
-//    {
-//        .name = "Task2\0",
-//        .p_i = mainTASK2_PERIOD_MS,
-//        .start_time = 0,
-//        .priority = -1,
-//        .func = prvTask2
-//    },
-//    {
-//        .name = "Task3\0",
-//        .p_i = mainTASK3_PERIOD_MS,
-//        .start_time = 0,
-//        .priority = -1,
-//        .func = prvTask3
-//    },
-//    { //TODO: add if statement to switch between this and polling server
-//        .name = "d\0",
-//        .p_i = mainDEFERRABLE_SERVER_PERIOD_MS,
-//        .start_time = 0,
-//        .priority = -1,
-//        .func = prvDeferrableServer
-//    }
-//};
 /*-----------------------------------------------------------*/
 
 int main( void )
@@ -222,11 +196,13 @@ int main( void )
     can be done here if it was not done before main() was called. */
 //    prvSetupHardware();
 
-//    timer_init(); // Initialize Timer, needed before any LCD screen functions can be called
-//                     // and enables time functions (e.g. //timer_waitMillis)
-//    lcd_init();
+    timer_init(); // Initialize Timer, needed before any LCD screen functions can be called
+                     // and enables time functions (e.g. //timer_waitMillis)
+    lcd_init();
+      sensor_data = oi_alloc();
+      oi_init(sensor_data);
 
-//    uart_init();
+    uart_init();
     int i, tasks_assigned;
 
     /* Create the queue for aperiodic tasks if an aperiodic server is desired */
@@ -235,79 +211,48 @@ int main( void )
         aperiodic_task_queue = xQueueCreate( 10, sizeof( struct aperiodic_task ) );
     }
 
-    /* Create the list of tasks */
-    // struct periodic_task tasks[NUM_TASKS] = {
-    //     {
-    //         .name = "Task1\0",
-    //         .p_i = mainTASK1_PERIOD_MS,
-    //         .start_time = 0,
-    //         .priority = -1,
-    //         .func = prvTask1
-    //     },
-    //     {
-    //         .name = "Task2\0",
-    //         .p_i = mainTASK2_PERIOD_MS,
-    //         .start_time = 0,
-    //         .priority = -1,
-    //         .func = prvTask2
-    //     },
-    //     {
-    //         .name = "Task3\0",
-    //         .p_i = mainTASK3_PERIOD_MS,
-    //         .start_time = 0,
-    //         .priority = -1,
-    //         .func = prvTask3
-    //     },
-    //     { //TODO: add if statement to switch between this and polling server
-    //         .name = "d\0",
-    //         .p_i = mainDEFERRABLE_SERVER_PERIOD_MS,
-    //         .start_time = 0,
-    //         .priority = -1,
-    //         .func = prvDeferrableServer
-    //     }
-    // };
 
     struct periodic_task *tasks;
-    tasks = pvPortMalloc( NUM_TASKS * sizeof( periodic_task ) );
+    tasks = pvPortMalloc( NUM_TASKS * sizeof(struct periodic_task ) );
 
     tasks[0].name = pvPortMalloc( 12 * sizeof( char ) ); 
     tasks[0].name = "Task1\0";
     tasks[0].p_i = mainTASK1_PERIOD_MS;
     tasks[0].start_time = 0;
     tasks[0].priority = -1;
-    tasks[0].func = prvTask1;
+    tasks[0].func = (Function_Pointer) prvTask1;
 
     tasks[1].name = pvPortMalloc( 12 * sizeof( char ) );
     tasks[1].name = "Task2\0";
     tasks[1].p_i = mainTASK2_PERIOD_MS;
     tasks[1].start_time = 0;
     tasks[1].priority = -1;
-    tasks[1].func = prvTask2;
+    tasks[1].func = (Function_Pointer) prvTask2;
 
     tasks[2].name = pvPortMalloc( 12 * sizeof( char ) );
     tasks[2].name = "Task3\0";
     tasks[2].p_i = mainTASK3_PERIOD_MS;
     tasks[2].start_time = 0;
     tasks[2].priority = -1;
-    tasks[2].func = prvTask3;
+    tasks[2].func = (Function_Pointer) prvTask3;
 
-    if APERIODIC_SERVER_TYPE == SERVER_TYPE_POLLING_SERVER
+    if (APERIODIC_SERVER_TYPE == SERVER_TYPE_POLLING_SERVER)
     {
         tasks[3].name = pvPortMalloc( 12 * sizeof( char ) );
         tasks[3].name = "d\0";
         tasks[3].p_i = mainPOLLING_SERVER_PERIOD_MS;
         tasks[3].start_time = 0;
         tasks[3].priority = -1;
-        tasks[3].func = prvPollingServer;
+        tasks[3].func = (Function_Pointer) prvPollingServer;
     }
-    else if APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER
+    else if (APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER)
     {
         tasks[3].name = pvPortMalloc( 12 * sizeof( char ) );
         tasks[3].name = "d\0";
         tasks[3].p_i = mainDEFERRABLE_SERVER_PERIOD_MS;
         tasks[3].start_time = 0;
         tasks[3].priority = -1;
-        tasks[3].func = prvDeferrableServer;
+        tasks[3].func = (Function_Pointer) prvDeferrableServer;
     }
     else
     {
@@ -389,9 +334,10 @@ int main( void )
 
     /* Start the tasks and timer running. */
 //    uart_sendStr_A("------------START-----------\r\n");
-    static char cBuffer[ 80 ];
-    vTaskList(cBuffer);
-    printf(cBuffer);
+//    static char cBuffer[ 80 ];
+//    vTaskList(cBuffer);
+//    uart_sendStr_A(cBuffer);
+    uart_sendStr_A("\n\n\n\r--------------START-------------\r\n");
     vTaskStartScheduler();
 
     /* If all is well, the scheduler will now be running, and the following line
@@ -399,11 +345,12 @@ int main( void )
     insufficient FreeRTOS heap memory available for the idle and/or timer tasks
     to be created.  See the memory management section on the FreeRTOS web site
     for more details.  */
+    uart_sendStr_A("I should never reach here\r\n");
     for( ;; );
 }
 /*-------------------TASKS---------------------*/
 
-static void prvTask1( void *pvParameters )
+static void prvTask1( void *pvParameters ) ///move forwards 20 CM
 {
     TickType_t xNextWakeTime;
     int this_task_index = mainTASK1_INDEX;
@@ -429,18 +376,16 @@ static void prvTask1( void *pvParameters )
 
     for( ;; )
     {
-//        TickType_t xTimeNow;
-//        TickType_t final;
-//        xTimeNow = xTaskGetTickCount();
-//        final = xTimeNow + pdMS_TO_TICKS( 672 );
-//        while(final > xTimeNow)
-//        {
-//            xTimeNow = xTaskGetTickCount();
-//        }
+
+        uart_sendStr_A("Task 1 running!\r\n");
+        oi_setWheels(0,0);
+        moveForward(sensor_data, 200.0);
 
         /* given a 1/10 chance, put an aperiodic task onto the queue */
         if ( APERIODIC_SERVER_TYPE != SERVER_TYPE_NO_SERVER && rand() % 10 == 0 )
         {
+            uart_sendStr_A("Task 1 sending aperiodic task to queue!\r\n");
+
             xQueueSend( aperiodic_task_queue, ( void * ) &sample_aperiodic_task, 0 );
             if ( APERIODIC_SERVER_TYPE == SERVER_TYPE_DEFERRABLE_SERVER && aperiodic_tasks_this_cycle == 0 )
             {
@@ -449,10 +394,47 @@ static void prvTask1( void *pvParameters )
                  * executed an aperiodic task this cycle, we must wake
                  * the server so that it can execute the aperiodic task */
                 TaskHandle_t deferrable_server_handle = xTaskGetHandle( "d\0" );
+//                TaskHandle_t task_1_handle = xTaskGetHandle( "Task1\0" );
+//                TaskHandle_t task_2_handle = xTaskGetHandle( "Task2\0" );
+//                TaskHandle_t task_3_handle = xTaskGetHandle( "Task3\0" );
+
+                eTaskState def_state = eTaskGetState( deferrable_server_handle );
+                uart_sendStr_A("Deferrable server state before abort delay: ");
+                switch( def_state )
+                {
+                    case eRunning:      uart_sendStr_A("Running\r\n");
+                                        break;
+                    case eReady:        uart_sendStr_A("Ready\r\n");
+                                        break;
+                    case eBlocked:      uart_sendStr_A("Blocked\r\n");
+                                        break;
+                    case eSuspended:    uart_sendStr_A("Suspended\r\n");
+                                        break;
+                    case eDeleted:      uart_sendStr_A("Deleted\r\n");
+                                        break;
+                }
+                oi_setWheels(0,0);//set when we change priority
                 xTaskAbortDelay( deferrable_server_handle );
+                def_state = eTaskGetState( deferrable_server_handle );
+                uart_sendStr_A("Deferrable server state after abort delay: ");
+                switch( def_state )
+                {
+                    case eRunning:      uart_sendStr_A("Running\r\n");
+                                        break;
+                    case eReady:        uart_sendStr_A("Ready\r\n");
+                                        break;
+                    case eBlocked:      uart_sendStr_A("Blocked\r\n");
+                                        break;
+                    case eSuspended:    uart_sendStr_A("Suspended\r\n");
+                                        break;
+                    case eDeleted:      uart_sendStr_A("Deleted\r\n");
+                                        break;
+                }
                 /* if it is not in the blocked state this shouldn't do anything */
             }
         }
+
+        uart_sendStr_A("Task 1 finished running!\r\n");
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -464,13 +446,9 @@ static void prvTask1( void *pvParameters )
             /* Call the EDF Scheduler to re-arrange priorities based on this new start time.
             * We must temporarily raise our priority to the highest priority so that we can
             * ensure that the scheduling is uninterrupted. */
-            test1 = tasks[3].start_time;
-            test2 = tasks[3].p_i;
                   taskENTER_CRITICAL();
                   prvEDFScheduler( tasks, this_task_index );
                   taskEXIT_CRITICAL();
-
-
 
         }
 
@@ -479,16 +457,22 @@ static void prvTask1( void *pvParameters )
         to ms.  The task will not consume any CPU time while it is in the
         Blocked state. */
 //        lcd_printf("%d", count);
-        count++;
-        static char cBuffer[ 80 ];
-        vTaskList(cBuffer);
-        printf(cBuffer);
+//        count++;
+//        printf(cBuffer);
+
+        /* if the current tick count is greater than the time of unblocking,
+         * the task has missed its deadline */
+        if ( xTaskGetTickCount() > xNextWakeTime + this_task_period )
+        {
+            uart_sendStr_A("Task 1 missed deadline!\r\n");
+        }
+
         vTaskDelayUntil( &xNextWakeTime, this_task_period );
     }
 }
 /*-----------------------------------------------------------*/
 
-static void prvTask2( void *pvParameters )
+static void prvTask2( void *pvParameters )// turn left 30 deg
 {
     TickType_t xNextWakeTime;
     int this_task_index = mainTASK2_INDEX;
@@ -520,6 +504,16 @@ static void prvTask2( void *pvParameters )
 //        {
 //            xTimeNow = xTaskGetTickCount();
 //        }
+        uart_sendStr_A("Task 2 running!\r\n");
+        oi_setWheels(0,0);
+        turnLeft(sensor_data, 90.0);
+
+//        while ( xTaskGetTickCount() < xNextWakeTime + this_task_period + 1920 )
+//        {
+//            i++;
+//        }
+////
+//        uart_sendStr_A("Task 2 done running, and took far longer than it should have \r\n");
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -539,16 +533,24 @@ static void prvTask2( void *pvParameters )
         to ms.  The task will not consume any CPU time while it is in the
         Blocked state. */
 //        lcd_printf("%d", count);
-        count++;
-        static char cBuffer[ 100 ];
-        vTaskList(cBuffer);
-        printf(cBuffer);
+//        count++;
+//        static char cBuffer[ 100 ];
+//        vTaskList(cBuffer);
+//        printf(cBuffer);
+
+        /* if the current tick count is greater than the time of unblocking,
+         * the task has missed its deadline */
+        if ( xTaskGetTickCount() > xNextWakeTime + this_task_period )
+        {
+            uart_sendStr_A("Task 2 missed deadline!\r\n");
+        }
+
         vTaskDelayUntil( &xNextWakeTime, this_task_period );
     }
 }
 /*-----------------------------------------------------------*/
 
-static void prvTask3( void *pvParameters )
+static void prvTask3( void *pvParameters ) //turn right
 {
     TickType_t xNextWakeTime;
     int this_task_index = mainTASK3_INDEX;
@@ -584,6 +586,9 @@ static void prvTask3( void *pvParameters )
 
 //        //timer_waitMillis(400);
 
+        uart_sendStr_A("Task 3 running!\r\n");
+        oi_setWheels(0,0);
+        turnRight(sensor_data, 90.0);
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
             /* update the initial start time for this task */
@@ -602,10 +607,17 @@ static void prvTask3( void *pvParameters )
         to ms.  The task will not consume any CPU time while it is in the
         Blocked state. */
 //        lcd_printf("%d", count);
-        count++;
-        static char cBuffer[ 100 ];
-        vTaskList(cBuffer);
-        printf(cBuffer);
+//        count++;
+//        static char cBuffer[ 100 ];
+//        vTaskList(cBuffer);
+//        printf(cBuffer);
+        /* if the current tick count is greater than the time of unblocking,
+         * the task has missed its deadline */
+        if ( xTaskGetTickCount() > xNextWakeTime + this_task_period )
+        {
+            uart_sendStr_A("Task 3 missed deadline!\r\n");
+        }
+
         vTaskDelayUntil( &xNextWakeTime, this_task_period );
     }
 }
@@ -643,17 +655,26 @@ static void prvDeferrableServer( void *pvParameters )
 //        }
 
 //        //timer_waitMillis(400);
-
+        uart_sendStr_A("Deferrable server running!\r\n");
+        oi_setWheels(0,0);
+        backup(sensor_data, 200.0);
         /* Check the queue for an aperiodic task */
         struct aperiodic_task received_task;
         aperiodic_tasks_this_cycle = 0;
         if ( xQueueReceive( aperiodic_task_queue, &received_task, 0 ) == pdPASS )
         {
+            uart_sendStr_A("Deferrable server received item from queue, running...\r\n");
             /* If an aperiodic task was received, run it */
             aperiodic_tasks_this_cycle++;
             received_task.func();
         }
+        else
+        {
+            uart_sendStr_A("Deferrable server found no item in queue\r\n");
+        }
         //TODO: implement using the c_i value of the aperiodic task?
+
+        uart_sendStr_A("Deferrable server done\r\n");
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -673,11 +694,20 @@ static void prvDeferrableServer( void *pvParameters )
         to ms.  The task will not consume any CPU time while it is in the
         Blocked state. */
 //        lcd_printf("%d", count);
-        count++;
-        static char cBuffer[ 100 ];
-        vTaskList(cBuffer);
-        printf(cBuffer);
+//        count++;
+//        static char cBuffer[ 100 ];
+//        vTaskList(cBuffer);
+//        printf(cBuffer);
+
+        /* if the current tick count is greater than the time of unblocking,
+         * the task has missed its deadline */
+        if ( xTaskGetTickCount() > xNextWakeTime + this_task_period )
+        {
+            uart_sendStr_A("Deferrable server missed deadline!\r\n");
+        }
+
         vTaskDelayUntil( &xNextWakeTime, this_task_period );
+        xNextWakeTime = xTaskGetTickCount();
     }
 }
 /*-----------------------------------------------------------*/
@@ -704,15 +734,24 @@ static void prvPollingServer( void *pvParameters )
 
     for( ;; )
     {
+        uart_sendStr_A("Polling server running!\r\n");
+        backup(sensor_data, 200.0);
+        oi_setWheels(0,0);
         /* Check the queue for an aperiodic task */
         struct aperiodic_task received_task;
         if ( xQueueReceive( aperiodic_task_queue, &received_task, 0 ) == pdPASS )
         {
+            uart_sendStr_A("Polling server received item from queue, running...\r\n");
             /* If an aperiodic task was received, run it */
             received_task.func();
         }
+        else
+        {
+            uart_sendStr_A("Polling server found no item in queue\r\n");
+        }
         //TODO: implement using the c_i value of the aperiodic task?
 
+        uart_sendStr_A("Polling server done\r\n");
 
         if ( SCHED_POLICY == SCHED_POLICY_EDF )
         {
@@ -732,9 +771,17 @@ static void prvPollingServer( void *pvParameters )
         to ms.  The task will not consume any CPU time while it is in the
         Blocked state. */
 //        lcd_printf("%d", count);
-        count++;
-        char* test;
-        vTaskList(test);
+//        count++;
+//        char* test;
+//        vTaskList(test);
+
+        /* if the current tick count is greater than the time of unblocking,
+         * the task has missed its deadline */
+        if ( xTaskGetTickCount() > xNextWakeTime + this_task_period )
+        {
+            uart_sendStr_A("Polling Server missed deadline!\r\n");
+        }
+
         vTaskDelayUntil( &xNextWakeTime, this_task_period );
 
     }
@@ -806,6 +853,7 @@ static void prvEDFScheduler( struct periodic_task *tasks, int calling_task_index
         }
 
     }
+    oi_setWheels(0,0);
 
 }
 /*-----------------------------------------------------------*/

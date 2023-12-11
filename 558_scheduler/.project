@@ -43,42 +43,42 @@
 		<link>
 			<name>third_party/FreeRTOS/Source/croutine.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/croutine.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/croutine.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/list.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/list.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/list.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/queue.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/queue.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/queue.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/tasks.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/tasks.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/tasks.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/timers.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/timers.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/timers.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/portable/MemMang/heap_2.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/portable/MemMang/heap_2.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/heap_3.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.c</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.c</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/port.c</locationURI>
 		</link>
 		<link>
 			<name>third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.asm</name>
 			<type>1</type>
-			<locationURI>SW_ROOT/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.asm</locationURI>
+			<locationURI>PROJECT_LOC/eat_shit_and_DIE/portasm.asm</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>

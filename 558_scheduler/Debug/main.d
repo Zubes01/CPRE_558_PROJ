@@ -14,17 +14,17 @@ main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/_stdint
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/stdint.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_stdint.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/FreeRTOS.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/FreeRTOS.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stddef.h
 main.obj: U:/cpre558ProjWorkspace/558_scheduler/FreeRTOSConfig.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/projdefs.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/portable.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/deprecated_definitions.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portmacro.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/mpu_wrappers.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/task.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h
-main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/timers.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/projdefs.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portable.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/deprecated_definitions.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portmacro.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/mpu_wrappers.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/task.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/list.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/timers.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_sysctl.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h
@@ -42,6 +42,8 @@ main.obj: ../lcd.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/string.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/xlocale/_string.h
 main.obj: ../uart.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/semphr.h
+main.obj: U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/queue.h
 main.obj: ../open_interface.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
 main.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/math.h
@@ -84,27 +86,27 @@ C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_stdint.h
 
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/FreeRTOS.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/FreeRTOS.h:
 
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stddef.h:
 
 U:/cpre558ProjWorkspace/558_scheduler/FreeRTOSConfig.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/projdefs.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/projdefs.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/portable.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portable.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/deprecated_definitions.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/deprecated_definitions.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portmacro.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/portmacro.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/mpu_wrappers.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/mpu_wrappers.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/task.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/task.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/list.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/list.h:
 
-C:/ti/TivaWare_C_Series-2.2.0.295/third_party/FreeRTOS/Source/include/timers.h:
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/timers.h:
 
 C:/ti/TivaWare_C_Series-2.2.0.295/inc/hw_memmap.h:
 
@@ -139,6 +141,10 @@ C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/string.h:
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/xlocale/_string.h:
 
 ../uart.h:
+
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/semphr.h:
+
+U:/cpre558ProjWorkspace/558_scheduler/eat_shit_and_DIE/queue.h:
 
 ../open_interface.h:
 

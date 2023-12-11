@@ -27,14 +27,16 @@ ORDERED_OBJS += \
 "./uart-interrupt.obj" \
 "./uart.obj" \
 "./drivers/rtos_hw_drivers.obj" \
-"./third_party/FreeRTOS/Source/croutine.obj" \
-"./third_party/FreeRTOS/Source/list.obj" \
-"./third_party/FreeRTOS/Source/queue.obj" \
-"./third_party/FreeRTOS/Source/tasks.obj" \
-"./third_party/FreeRTOS/Source/timers.obj" \
-"./third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" \
-"./third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.obj" \
-"./third_party/FreeRTOS/Source/portable/MemMang/heap_2.obj" \
+"./eat_shit_and_DIE/croutine.obj" \
+"./eat_shit_and_DIE/event_groups.obj" \
+"./eat_shit_and_DIE/heap_4.obj" \
+"./eat_shit_and_DIE/list.obj" \
+"./eat_shit_and_DIE/port.obj" \
+"./eat_shit_and_DIE/portasm.obj" \
+"./eat_shit_and_DIE/queue.obj" \
+"./eat_shit_and_DIE/stream_buffer.obj" \
+"./eat_shit_and_DIE/tasks.obj" \
+"./eat_shit_and_DIE/timers.obj" \
 "./utils/uartstdio.obj" \
 "./utils/ustdlib.obj" \
 "../hello_freertos_ccs.cmd" \
@@ -51,15 +53,11 @@ RMDIR := RMDIR /S/Q
 -include sources.mk
 -include subdir_vars.mk
 -include drivers/subdir_vars.mk
--include third_party/FreeRTOS/Source/subdir_vars.mk
--include third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/subdir_vars.mk
--include third_party/FreeRTOS/Source/portable/MemMang/subdir_vars.mk
+-include eat_shit_and_DIE/subdir_vars.mk
 -include utils/subdir_vars.mk
 -include subdir_rules.mk
 -include drivers/subdir_rules.mk
--include third_party/FreeRTOS/Source/subdir_rules.mk
--include third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/subdir_rules.mk
--include third_party/FreeRTOS/Source/portable/MemMang/subdir_rules.mk
+-include eat_shit_and_DIE/subdir_rules.mk
 -include utils/subdir_rules.mk
 -include objects.mk
 
@@ -170,7 +168,7 @@ all: 558_scheduler.out
 558_scheduler.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -Ooff --define=ccs="ccs" --define=TARGET_IS_TM4C129_RA1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --ual -z -m"558_scheduler.map" --heap_size=2048 --stack_size=4096 -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="558_scheduler_linkInfo.xml" --rom_model -o "558_scheduler.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -Ooff --define=ccs="ccs" --define=TARGET_IS_TM4C129_RA1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --ual -z -m"558_scheduler.map" --heap_size=4096 --stack_size=4096 -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="558_scheduler_linkInfo.xml" --rom_model -o "558_scheduler.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -178,9 +176,9 @@ all: 558_scheduler.out
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Timer.obj" "adc.obj" "cliff.obj" "hello_task.obj" "lab6_template.obj" "lcd.obj" "main.obj" "movement.obj" "open_interface.obj" "ping_template.obj" "resetSimulation.obj" "scan.obj" "servo.obj" "startup_ccs.obj" "uart-interrupt.obj" "uart.obj" "drivers\rtos_hw_drivers.obj" "third_party\FreeRTOS\Source\croutine.obj" "third_party\FreeRTOS\Source\list.obj" "third_party\FreeRTOS\Source\queue.obj" "third_party\FreeRTOS\Source\tasks.obj" "third_party\FreeRTOS\Source\timers.obj" "third_party\FreeRTOS\Source\portable\CCS\ARM_CM4F\port.obj" "third_party\FreeRTOS\Source\portable\CCS\ARM_CM4F\portasm.obj" "third_party\FreeRTOS\Source\portable\MemMang\heap_2.obj" "utils\uartstdio.obj" "utils\ustdlib.obj" 
-	-$(RM) "Timer.d" "adc.d" "cliff.d" "hello_task.d" "lab6_template.d" "lcd.d" "main.d" "movement.d" "open_interface.d" "ping_template.d" "resetSimulation.d" "scan.d" "servo.d" "startup_ccs.d" "uart-interrupt.d" "uart.d" "drivers\rtos_hw_drivers.d" "third_party\FreeRTOS\Source\croutine.d" "third_party\FreeRTOS\Source\list.d" "third_party\FreeRTOS\Source\queue.d" "third_party\FreeRTOS\Source\tasks.d" "third_party\FreeRTOS\Source\timers.d" "third_party\FreeRTOS\Source\portable\CCS\ARM_CM4F\port.d" "third_party\FreeRTOS\Source\portable\MemMang\heap_2.d" "utils\uartstdio.d" "utils\ustdlib.d" 
-	-$(RM) "third_party\FreeRTOS\Source\portable\CCS\ARM_CM4F\portasm.d" 
+	-$(RM) "Timer.obj" "adc.obj" "cliff.obj" "hello_task.obj" "lab6_template.obj" "lcd.obj" "main.obj" "movement.obj" "open_interface.obj" "ping_template.obj" "resetSimulation.obj" "scan.obj" "servo.obj" "startup_ccs.obj" "uart-interrupt.obj" "uart.obj" "drivers\rtos_hw_drivers.obj" "eat_shit_and_DIE\croutine.obj" "eat_shit_and_DIE\event_groups.obj" "eat_shit_and_DIE\heap_4.obj" "eat_shit_and_DIE\list.obj" "eat_shit_and_DIE\port.obj" "eat_shit_and_DIE\portasm.obj" "eat_shit_and_DIE\queue.obj" "eat_shit_and_DIE\stream_buffer.obj" "eat_shit_and_DIE\tasks.obj" "eat_shit_and_DIE\timers.obj" "utils\uartstdio.obj" "utils\ustdlib.obj" 
+	-$(RM) "Timer.d" "adc.d" "cliff.d" "hello_task.d" "lab6_template.d" "lcd.d" "main.d" "movement.d" "open_interface.d" "ping_template.d" "resetSimulation.d" "scan.d" "servo.d" "startup_ccs.d" "uart-interrupt.d" "uart.d" "drivers\rtos_hw_drivers.d" "eat_shit_and_DIE\croutine.d" "eat_shit_and_DIE\event_groups.d" "eat_shit_and_DIE\heap_4.d" "eat_shit_and_DIE\list.d" "eat_shit_and_DIE\port.d" "eat_shit_and_DIE\queue.d" "eat_shit_and_DIE\stream_buffer.d" "eat_shit_and_DIE\tasks.d" "eat_shit_and_DIE\timers.d" "utils\uartstdio.d" "utils\ustdlib.d" 
+	-$(RM) "eat_shit_and_DIE\portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

@@ -49,13 +49,17 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
+#define vPortSVCHandler SVC_Handler
+#define xPortPendSVHandler PendSV_Handler
+//#define xPortSysTickHandler SysTick_Handler
+
 #define configUSE_PREEMPTION                1
 #define configUSE_TIME_SLICING               0
 #define configUSE_IDLE_HOOK                 0
 #define configUSE_TICK_HOOK                 0
-#define configCPU_CLOCK_HZ                  ( ( unsigned long ) 16000000 )
-#define configTICK_RATE_HZ                  ( ( portTickType ) 1000 )
-#define configMINIMAL_STACK_SIZE            ( ( unsigned short ) 800 )//changed from 200
+#define configCPU_CLOCK_HZ                  ( ( unsigned long ) 80000000 )
+#define configTICK_RATE_HZ                  ( ( portTickType ) 1000 )//------------CHANGE BACK TO 1000---------------------------------------------
+#define configMINIMAL_STACK_SIZE            ( ( unsigned short ) 600 )//changed from 200
 #define configTOTAL_HEAP_SIZE               ( ( size_t ) ( 20240 ) )
 #define configMAX_TASK_NAME_LEN             ( 12 )
 #define configUSE_TRACE_FACILITY            1
@@ -82,6 +86,8 @@ to exclude the API function. */
 #define INCLUDE_vTaskSuspend                1
 #define INCLUDE_vTaskDelayUntil             1
 #define INCLUDE_vTaskDelay                  1
+#define INCLUDE_xTaskAbortDelay             1
+#define INCLUDE_xTaskGetHandle              1
 #define INCLUDE_uxTaskGetStackHighWaterMark 1
 
 /* Cortex-M3/4 interrupt priority configuration follows...................... */
